@@ -1,0 +1,5 @@
+# AIRA dependencies
+# Install with: pip install -r requirements.txt
+
+vaderSentiment>=3.3.2      # Sentiment analysis engine
+requests>=2.31.0           # Ollama HTTP API calls

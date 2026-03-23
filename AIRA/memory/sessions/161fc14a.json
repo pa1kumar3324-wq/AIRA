@@ -1,0 +1,51 @@
+{
+  "session_id": "161fc14a",
+  "username": "Pavan",
+  "started_at": "2026-03-21T22:35:13.556280",
+  "ended_at": "2026-03-21T22:42:15.491810",
+  "message_count": 7,
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "timestamp": "2026-03-21T22:35:20.204244",
+      "emotion": "neutral"
+    },
+    {
+      "role": "assistant",
+      "content": "\n[AIRA] The model took too long to respond. Please try again.\n",
+      "timestamp": "2026-03-21T22:36:22.293824",
+      "emotion": null
+    },
+    {
+      "role": "user",
+      "content": "i am sad",
+      "timestamp": "2026-03-21T22:36:30.125821",
+      "emotion": "frustrated"
+    },
+    {
+      "role": "assistant",
+      "content": "\n[AIRA] The model took too long to respond. Please try again.\n",
+      "timestamp": "2026-03-21T22:37:32.335742",
+      "emotion": null
+    },
+    {
+      "role": "user",
+      "content": "lol",
+      "timestamp": "2026-03-21T22:37:59.587703",
+      "emotion": "content"
+    },
+    {
+      "role": "assistant",
+      "content": "\n[AIRA] The model took too long to respond. Please try again.\n",
+      "timestamp": "2026-03-21T22:39:01.825736",
+      "emotion": null
+    },
+    {
+      "role": "user",
+      "content": "fuck off",
+      "timestamp": "2026-03-21T22:39:53.226119",
+      "emotion": "frustrated"
+    }
+  ]
+}
