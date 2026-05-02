@@ -3,7 +3,7 @@
 > An AI chatbot that reads how you're feeling and responds accordingly.
 
 ![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)
-![Ollama](https://img.shields.io/badge/Ollama-Mistral-black?style=flat)
+![Ollama](https://img.shields.io/badge/Ollama-Mistral%20%2F%20Phi3%20%2F%20Llama3-black?style=flat)
 ![VADER](https://img.shields.io/badge/Sentiment-VADER-orange?style=flat)
 ![Status](https://img.shields.io/badge/Status-Stable-green?style=flat)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat)
@@ -14,7 +14,9 @@
 
 Most chatbots respond to *what* you say. AIRA responds to *how* you're feeling.
 
-AIRA (Adaptive Intelligent Responsive Agent) analyses the emotional tone of every message you send using VADER sentiment analysis, then dynamically adjusts its personality and response style before passing the conversation to a locally running Mistral LLM via Ollama.
+AIRA (Adaptive Intelligent Responsive Agent) analyses the emotional tone of every message you send using VADER sentiment analysis, then dynamically adjusts its personality and response style before passing the conversation to a locally running LLM via Ollama.
+
+The system automatically profiles your hardware on startup and selects the best available model (Llama 3 70B for high-end machines, Llama 3 8B for mid-range, or Phi-3 for lower-end systems) to ensure optimal performance without manual configuration.
 
 If you're happy, AIRA is upbeat. If you're stressed, it's calm and reassuring. If you're frustrated, it skips the fluff and gets to the point.
 
@@ -62,7 +64,7 @@ AIRA uses a `config.json` file for settings. Create or edit this file in the pro
 ```json
 {
   "ollama_url": "http://localhost:11434/api/chat",
-  "model": "mistral",
+  "model": "phi3",
   "temperature": 0.75,
   "max_tokens": 1024,
   "max_context": 20,
@@ -118,11 +120,30 @@ Response + Memory Storage
 
 ---
 
+## Hardware Profiling
+
+AIRA automatically detects your system's hardware capabilities on startup:
+
+- **RAM and CPU**: Profiles total system memory and CPU cores
+- **GPU VRAM**: Detects NVIDIA/AMD GPUs and available VRAM
+- **Model Selection**: Chooses the optimal Ollama model based on hardware tiers:
+
+| Tier | Hardware Requirements | Model | Size |
+|------|----------------------|-------|------|
+| Tier 1 | 32GB+ RAM or 16GB+ GPU VRAM | Llama 3 70B | ~40GB |
+| Tier 2 | 16GB+ RAM | Llama 3 8B | ~5GB |
+| Tier 3 | <16GB RAM | Phi-3 | ~2GB |
+
+If the selected model isn't available locally, AIRA will automatically pull it via Ollama. This ensures the best possible performance without manual model management.
+
+---
+
 ## Project Structure
 
 ```
 AIRA/
 ├── main.py                  # Entry point — run this to start AIRA
+├── hardware_profiler.py     # Hardware detection and model selection
 ├── config.json              # Configuration file for settings
 ├── requirements.txt         # Python dependencies
 ├── README.md
@@ -165,16 +186,17 @@ pip install -r requirements.txt
 # This installs: vaderSentiment, requests, colorama
 ```
 
-**3. Pull the Mistral model via Ollama**
+**3. Start Ollama server**
 ```bash
-ollama serve          # start the Ollama server
-ollama pull mistral   # download Mistral (~4 GB)
+ollama serve          # start the Ollama server in the background
 ```
 
 **4. Run AIRA**
 ```bash
 python main.py
 ```
+
+AIRA will automatically profile your hardware and pull the appropriate model if it's not already available locally.
 
 ---
 
@@ -187,15 +209,13 @@ python main.py --history          # view past session summaries
 python main.py --clear            # delete all saved history
 ```
 
-### In-chat commands
+### Running Tests
 
-| Command | Description |
-|---|---|
-| `/help` | Show all available commands |
-| `/emotion` | Show the emotion detected in your last message |
-| `/history` | List past conversation sessions |
-| `/clear` | Clear current session memory |
-| `/quit` | Save session and exit |
+To run the unit tests for sentiment analysis:
+
+```bash
+python -m unittest tests/test_sentiment.py
+```
 
 ---
 
@@ -204,8 +224,10 @@ python main.py --clear            # delete all saved history
 | Layer | Technology |
 |---|---|
 | Sentiment Analysis | [VADER](https://github.com/cjhutto/vaderSentiment) |
-| Language Model | [Mistral](https://mistral.ai) via [Ollama](https://ollama.com) |
+| Language Model | [Mistral](https://mistral.ai) / [Phi-3](https://huggingface.co/microsoft/Phi-3-mini-4k-instruct) / [Llama 3](https://llama.meta.com/llama3/) via [Ollama](https://ollama.com) |
+| Hardware Profiling | [psutil](https://github.com/giampaolo/psutil) |
 | Cross-platform Colors | [Colorama](https://github.com/tartley/colorama) |
+| Ollama SDK | [ollama-python](https://github.com/ollama/ollama-python) |
 | Language | Python 3.12+ with type hints |
 | Memory Storage | JSON (local filesystem) |
 | Interface | Terminal CLI with logging |
