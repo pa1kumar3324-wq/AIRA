@@ -1,6 +1,6 @@
 {
   "ollama_url": "http://localhost:11434/api/chat",
-  "model": "mistral",
+  "model": "phi3",
   "temperature": 0.75,
   "max_tokens": 1024,
   "max_context": 20,

@@ -55,6 +55,8 @@ class CLIInterface:
         self.sentiment = SentimentEngine()
         self.llm       = LLMClient()
         self.memory    = ConversationMemory(username=username)
+        # Reflect the model that was selected by the hardware profiler at boot
+        self._active_model = self.llm.model
 
     # ── Session lifecycle ────────────────────────────────────────────────────
 
@@ -155,15 +157,18 @@ class CLIInterface:
 
     def _print_banner(self):
         os.system("clear" if os.name == "posix" else "cls")
-        print(f"""
-{CYAN}{BOLD}
-  ╔═══════════════════════════════════════════╗
-  ║   A I R A  —  Emotionally Intelligent AI  ║
-  ║   Powered by Mistral via Ollama           ║
-  ╚═══════════════════════════════════════════╝
-{RESET}""")
-        print(f"  Welcome, {BOLD}{self.username}{RESET}. Type {DIM}/help{RESET} for commands.\n")
-        print(f"  {DIM}{'─' * 45}{RESET}\n")
+        model_line = "  Powered by " + self._active_model + "  via Ollama"
+        _w = 47
+        print()
+        print(CYAN + BOLD + "  " + "=" * _w + RESET)
+        print(CYAN + BOLD + "  |{:^{w}}|".format("A I R A  --  Emotionally Intelligent AI", w=_w - 2) + RESET)
+        print(CYAN + BOLD + "  |{:^{w}}|".format(model_line, w=_w - 2) + RESET)
+        print(CYAN + BOLD + "  " + "=" * _w + RESET)
+        print()
+        print("  Welcome, {}{}{}. Type {}{}{} for commands.\n".format(
+            BOLD, self.username, RESET, DIM, "/help", RESET))
+        print("  {}{}{}\n".format(DIM, "-" * 45, RESET))
+
 
     def _print_help(self):
         print(f"\n  {BOLD}Available commands:{RESET}")
@@ -172,17 +177,24 @@ class CLIInterface:
         print()
 
     def _check_ollama(self):
+        model_display = self._active_model
         if not self.llm.is_available():
-            print(f"  {YELLOW}Warning:{RESET} Ollama is not running.")
-            print(f"  Start it with: {DIM}ollama serve{RESET}")
-            print(f"  Then pull the model: {DIM}ollama pull mistral{RESET}\n")
+            print("  {}Warning:{} Ollama is not running.".format(YELLOW, RESET))
+            print("  Start it with: {}ollama serve{}".format(DIM, RESET))
+            print("  Then pull the model: {}ollama pull {}{}".format(DIM, model_display, RESET))
+            print()
         else:
             models = self.llm.list_models()
-            if "mistral" not in " ".join(models):
-                print(f"  {YELLOW}Warning:{RESET} Mistral model not found locally.")
-                print(f"  Pull it with: {DIM}ollama pull mistral{RESET}\n")
+            model_base = model_display.split(":")[0].lower()
+            if not any(model_base in m.lower() for m in models):
+                print("  {}Warning:{} Model '{}{}{}' not found locally.".format(
+                    YELLOW, RESET, BOLD, model_display, RESET))
+                print("  Pull it with: {}ollama pull {}{}".format(DIM, model_display, RESET))
+                print()
             else:
-                print(f"  {GREEN}Ollama connected. Mistral ready.{RESET}\n")
+                print("  {}[OK]{} Ollama connected.  Model: {}{}{}{}".format(
+                    GREEN, RESET, BOLD, CYAN, model_display, RESET))
+                print()
 
     # ── History display ───────────────────────────────────────────────────────
 
