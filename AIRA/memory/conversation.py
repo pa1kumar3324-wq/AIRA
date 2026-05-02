@@ -22,9 +22,19 @@ import uuid
 from datetime import datetime
 from pathlib import Path
 
+CONFIG_FILE = Path(__file__).parent.parent / "config.json"
+
+def load_config():
+    if CONFIG_FILE.exists():
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    return {"max_context": 20}
+
+config = load_config()
+
 SESSIONS_DIR   = Path(__file__).parent / "sessions"
 INDEX_FILE     = Path(__file__).parent / "index.json"
-MAX_CONTEXT    = 20   # max messages kept in active context window
+MAX_CONTEXT    = config["max_context"]   # max messages kept in active context window
 
 
 class ConversationMemory:
