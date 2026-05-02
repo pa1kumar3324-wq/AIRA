@@ -15,11 +15,27 @@ Ollama runs on http://localhost:11434 by default.
 import json
 import requests
 from typing import Generator
+from pathlib import Path
 
-OLLAMA_URL   = "http://localhost:11434/api/chat"
-MODEL_NAME   = "mistral"
-TEMPERATURE  = 0.75
-MAX_TOKENS   = 1024
+CONFIG_FILE = Path(__file__).parent.parent / "config.json"
+
+def load_config():
+    if CONFIG_FILE.exists():
+        with open(CONFIG_FILE, "r") as f:
+            return json.load(f)
+    return {
+        "ollama_url": "http://localhost:11434/api/chat",
+        "model": "mistral",
+        "temperature": 0.75,
+        "max_tokens": 1024,
+    }
+
+config = load_config()
+
+OLLAMA_URL   = config["ollama_url"]
+MODEL_NAME   = config["model"]
+TEMPERATURE  = config["temperature"]
+MAX_TOKENS   = config["max_tokens"]
 
 AIRA_BASE_SYSTEM = """You are AIRA (Adaptive Intelligent Responsive Agent), an emotionally intelligent AI chatbot.
 
@@ -38,6 +54,25 @@ class LLMClient:
     def __init__(self, model: str = MODEL_NAME):
         self.model = model
         self.base_url = OLLAMA_URL
+
+    def is_available(self) -> bool:
+        """Check if Ollama is running."""
+        try:
+            response = requests.get(self.base_url.replace("/api/chat", "/api/tags"), timeout=5)
+            return response.status_code == 200
+        except:
+            return False
+
+    def list_models(self) -> list[str]:
+        """List available models."""
+        try:
+            response = requests.get(self.base_url.replace("/api/chat", "/api/tags"), timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                return [model["name"] for model in data.get("models", [])]
+            return []
+        except:
+            return []
 
     def _build_system_prompt(self, tone_hint: str) -> str:
         tone_instruction = f"Current emotional context: {tone_hint}"

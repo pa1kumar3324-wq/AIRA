@@ -2,10 +2,10 @@
 
 > An AI chatbot that reads how you're feeling and responds accordingly.
 
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=flat&logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.12+-3776AB?style=flat&logo=python&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-Mistral-black?style=flat)
 ![VADER](https://img.shields.io/badge/Sentiment-VADER-orange?style=flat)
-![Status](https://img.shields.io/badge/Status-Under%20Development-yellow?style=flat)
+![Status](https://img.shields.io/badge/Status-Stable-green?style=flat)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat)
 
 ---
@@ -50,6 +50,32 @@ AIRA    That's awesome — seriously, that feeling after a solid study
 - **Persistent memory** — full conversation history saved to disk as JSON, browsable between sessions
 - **Clean CLI interface** — colour-coded terminal UI with slash commands
 - **Fully local** — no API keys, no cloud, everything runs on your machine via Ollama
+- **Configurable settings** — customize model, temperature, and other parameters via config.json
+- **Cross-platform support** — colored output works on Windows, macOS, and Linux
+
+---
+
+## Configuration
+
+AIRA uses a `config.json` file for settings. Create or edit this file in the project root:
+
+```json
+{
+  "ollama_url": "http://localhost:11434/api/chat",
+  "model": "mistral",
+  "temperature": 0.75,
+  "max_tokens": 1024,
+  "max_context": 20,
+  "username": "User"
+}
+```
+
+- `ollama_url`: URL to your Ollama instance
+- `model`: LLM model name (must be pulled in Ollama)
+- `temperature`: Creativity/randomness (0.0-1.0)
+- `max_tokens`: Maximum response length
+- `max_context`: Number of messages to keep in context
+- `username`: Default display name
 
 ---
 
@@ -97,6 +123,7 @@ Response + Memory Storage
 ```
 AIRA/
 ├── main.py                  # Entry point — run this to start AIRA
+├── config.json              # Configuration file for settings
 ├── requirements.txt         # Python dependencies
 ├── README.md
 │
@@ -108,8 +135,11 @@ AIRA/
 │   ├── conversation.py      # In-session context + persistent session storage
 │   └── sessions/            # Auto-created — stores JSON logs of each session
 │
-└── cli/
-    └── interface.py         # Terminal chat UI, colour output, command handler
+├── cli/
+│   └── interface.py         # Terminal chat UI, colour output, command handler
+│
+└── tests/
+    └── test_sentiment.py    # Unit tests for sentiment analysis
 ```
 
 ---
@@ -118,7 +148,7 @@ AIRA/
 
 ### Prerequisites
 
-- Python 3.10 or higher
+- Python 3.12 or higher
 - [Ollama](https://ollama.com) installed and running
 
 ### Installation
@@ -132,6 +162,7 @@ cd AIRA
 **2. Install Python dependencies**
 ```bash
 pip install -r requirements.txt
+# This installs: vaderSentiment, requests, colorama
 ```
 
 **3. Pull the Mistral model via Ollama**
@@ -174,9 +205,11 @@ python main.py --clear            # delete all saved history
 |---|---|
 | Sentiment Analysis | [VADER](https://github.com/cjhutto/vaderSentiment) |
 | Language Model | [Mistral](https://mistral.ai) via [Ollama](https://ollama.com) |
-| Language | Python 3.10+ |
+| Cross-platform Colors | [Colorama](https://github.com/tartley/colorama) |
+| Language | Python 3.12+ with type hints |
 | Memory Storage | JSON (local filesystem) |
-| Interface | Terminal CLI |
+| Interface | Terminal CLI with logging |
+| Testing | Unit tests with unittest |
 
 ---
 
@@ -187,11 +220,39 @@ python main.py --clear            # delete all saved history
 - [x] Emotion-to-tone mapping system
 - [x] Persistent conversation memory
 - [x] CLI interface with commands
+- [x] Configuration system (config.json)
+- [x] Cross-platform colored output
+- [x] Type hints and code quality improvements
+- [x] Unit testing framework
+- [x] Logging integration
 - [ ] Web UI (Flask / FastAPI)
 - [ ] Voice input via `speech_recognition`
 - [ ] Session summarisation for long conversations
 - [ ] Multi-model support (swap Mistral for other Ollama models)
 - [ ] Emotion trend visualisation across sessions
+- [ ] Docker containerization
+- [ ] CI/CD pipeline with automated testing
+
+---
+
+## Changelog
+
+### v1.1.0 (Latest)
+- **Configuration System**: Added `config.json` for customizable settings (model, temperature, context size, etc.)
+- **Cross-Platform Support**: Integrated Colorama for consistent colored output on Windows, macOS, and Linux
+- **Type Hints**: Added comprehensive type annotations throughout the codebase
+- **Logging**: Implemented logging for better debugging and session tracking
+- **Testing Framework**: Added unit tests for sentiment analysis with unittest
+- **Dependencies**: Updated to latest versions and added Colorama
+- **Code Quality**: Improved error handling, configuration loading, and module organization
+
+### v1.0.0 (Initial Release)
+- Core sentiment analysis with VADER
+- Ollama Mistral integration with streaming responses
+- Emotion-to-tone adaptive responses
+- Persistent conversation memory
+- CLI interface with commands
+- Cross-platform terminal UI
 
 ---
 

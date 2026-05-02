@@ -14,23 +14,30 @@ Commands (type during chat):
 
 import sys
 import os
+import logging
 from datetime import datetime
+
+import colorama
+from colorama import Fore, Back, Style
 
 from core.sentiment import SentimentEngine
 from core.llm import LLMClient
 from memory.conversation import ConversationMemory
 
+# Initialize colorama for cross-platform color support
+colorama.init(autoreset=True)
+
 # ── ANSI colour codes ────────────────────────────────────────────────────────
-RESET   = "\033[0m"
-BOLD    = "\033[1m"
-DIM     = "\033[2m"
-CYAN    = "\033[36m"
-GREEN   = "\033[32m"
-YELLOW  = "\033[33m"
-RED     = "\033[31m"
-MAGENTA = "\033[35m"
-WHITE   = "\033[97m"
-BLUE    = "\033[34m"
+RESET   = Style.RESET_ALL
+BOLD    = Style.BRIGHT
+DIM     = "\033[2m"  # Dim not directly in colorama, keep ANSI
+CYAN    = Fore.CYAN
+GREEN   = Fore.GREEN
+YELLOW  = Fore.YELLOW
+RED     = Fore.RED
+MAGENTA = Fore.MAGENTA
+WHITE   = Fore.WHITE
+BLUE    = Fore.BLUE
 
 COMMANDS = {
     "/quit":    "End the session and save history",
@@ -43,7 +50,7 @@ COMMANDS = {
 
 
 class CLIInterface:
-    def __init__(self, username: str = "User"):
+    def __init__(self, username: str = "User") -> None:
         self.username  = username
         self.sentiment = SentimentEngine()
         self.llm       = LLMClient()
@@ -51,16 +58,18 @@ class CLIInterface:
 
     # ── Session lifecycle ────────────────────────────────────────────────────
 
-    def start(self):
+    def start(self) -> None:
+        logging.info("Starting AIRA CLI interface")
         self._print_banner()
         self._check_ollama()
 
         try:
             self._chat_loop()
         except KeyboardInterrupt:
+            logging.info("Session interrupted by user")
             self._end_session()
 
-    def _chat_loop(self):
+    def _chat_loop(self) -> None:
         while True:
             user_input = self._prompt_user()
 
@@ -97,7 +106,7 @@ class CLIInterface:
             # Store assistant response
             self.memory.add_assistant_message(full_response)
 
-    def _end_session(self):
+    def _end_session(self) -> None:
         print(f"\n\n{DIM}Saving session...{RESET}")
         self.memory.save_session()
         msg_count = self.memory.message_count()
